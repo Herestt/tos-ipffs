@@ -23,8 +23,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 
 	@Override
 	public String getScheme() {
-		// TODO Auto-generated method stub
-		return null;
+		return "ipf";
 	}
 
 	@Override
