@@ -49,8 +49,7 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public String getSeparator() {
-		// TODO Auto-generated method stub
-		return null;
+		return "/";
 	}
 
 	@Override
