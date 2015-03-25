@@ -4,9 +4,23 @@ import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
+import java.util.Set;
 
 public class IpfFileStore extends FileStore {
 
+	private String name;
+	private long fileCount;
+	private byte[] magicNumber;
+	private Set<IpfPath> files;
+	
+	protected IpfFileStore(String name, long fileCount,
+			byte[] magicNumber, Set<IpfPath> files) {
+		this.name = name;
+		this.fileCount = fileCount;
+		this.magicNumber = magicNumber;
+		this.files = files;
+	}
+	
 	@Override
 	public String name() {
 		// TODO Auto-generated method stub
@@ -68,5 +82,4 @@ public class IpfFileStore extends FileStore {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
