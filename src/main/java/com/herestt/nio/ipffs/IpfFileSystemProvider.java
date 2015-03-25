@@ -9,30 +9,68 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystems;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class IpfFileSystemProvider extends FileSystemProvider {
 
+	private Map<Path, IpfFileSystem> fileSystems = new HashMap<>();
+	
 	@Override
 	public String getScheme() {
 		return "ipf";
 	}
 
+	private Path toFileSystemPath(URI uri) {
+		String scheme = uri.getScheme();
+		if(scheme == null || !scheme.equals(getScheme()))
+			throw new IllegalArgumentException("URI must use the '"+ getScheme()
+					+"' scheme so as to be handled by the IPF file system.");
+		
+		String spec = uri.getSchemeSpecificPart();
+		int index = spec.indexOf(".ipf");
+		if(index == -1)
+			throw new IllegalArgumentException("The URI doesn't target a ." + getScheme() + " file.");
+		
+		spec = spec.substring(0, index + 4).replace(" ", "%20");
+		Path path = Paths.get(URI.create(spec));
+		path.normalize();
+		
+		return path;
+	}
+	
 	@Override
 	public FileSystem newFileSystem(URI uri, Map<String, ?> env)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return newFileSystem(toFileSystemPath(uri), env);
 	}
 
+	@Override
+	public FileSystem newFileSystem(Path path, Map<String, ?> env)
+			throws IOException {
+		if(path.getFileSystem() != FileSystems.getDefault())
+			throw new UnsupportedOperationException("The path must target an '" + getScheme()
+					+ "' file hosted into the default file system.");
+		synchronized (fileSystems) {
+			if(fileSystems.containsKey(path))
+				throw new FileSystemAlreadyExistsException();
+			IpfFileSystem ipffs = new IpfFileSystem(this, path, env);
+			fileSystems.put(path, ipffs);
+			return  ipffs;
+		}
+	}
+	
 	@Override
 	public FileSystem getFileSystem(URI uri) {
 		// TODO Auto-generated method stub

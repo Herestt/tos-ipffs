@@ -8,10 +8,22 @@ import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Map;
 import java.util.Set;
 
 public class IpfFileSystem extends FileSystem {
 
+	private final IpfFileSystemProvider provider;
+	private final Path fileSystemPath;
+	private final Map<String, ?> env;
+	
+	protected IpfFileSystem(IpfFileSystemProvider provider, 
+			Path fileSystemPath, Map<String, ?> env) {
+		this.provider = provider;
+		this.fileSystemPath = fileSystemPath;
+		this.env = env;
+	}
+	
 	@Override
 	public FileSystemProvider provider() {
 		// TODO Auto-generated method stub
