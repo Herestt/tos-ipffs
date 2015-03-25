@@ -11,10 +11,10 @@ public class IpfFileStore extends FileStore {
 	private String name;
 	private long fileCount;
 	private byte[] magicNumber;
-	private Set<IpfPath> files;
+	private Set<IpfFileAttributes> files;
 	
 	protected IpfFileStore(String name, long fileCount,
-			byte[] magicNumber, Set<IpfPath> files) {
+			byte[] magicNumber, Set<IpfFileAttributes> files) {
 		this.name = name;
 		this.fileCount = fileCount;
 		this.magicNumber = magicNumber;
@@ -23,8 +23,7 @@ public class IpfFileStore extends FileStore {
 	
 	@Override
 	public String name() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
@@ -81,5 +80,19 @@ public class IpfFileStore extends FileStore {
 	public Object getAttribute(String attribute) throws IOException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/*** IPF File Store Specific Methods ***/
+	
+	public long getFileCount() {
+		return fileCount;
+	}
+	
+	public byte[] getMagicNumber() {
+		return magicNumber;
+	}
+	
+	public Set<IpfFileAttributes> getFiles() {
+		return files;
 	}
 }
