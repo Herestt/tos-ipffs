@@ -17,7 +17,7 @@ public class IpfFileSystem extends FileSystem {
 	private final Path fileSystemPath;
 	private final Map<String, ?> env;
 	
-	protected IpfFileSystem(IpfFileSystemProvider provider, 
+	protected IpfFileSystem(IpfFileSystemProvider provider,
 			Path fileSystemPath, Map<String, ?> env) {
 		this.provider = provider;
 		this.fileSystemPath = fileSystemPath;
@@ -74,8 +74,22 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public Path getPath(String first, String... more) {
-		// TODO Auto-generated method stub
-		return null;
+		String path;
+		if(more.length == 0)
+			path = first;
+		else {
+			StringBuilder sb = new StringBuilder();
+			sb.append(first);
+			for(String segment : more) {
+				if(segment.length() > 0) {
+					if(sb.length() > 0)
+						sb.append("/");
+					sb.append(segment);
+				}
+			}
+			path = sb.toString();
+		}
+		return new IpfPath(this, path);
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
@@ -73,14 +74,36 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	
 	@Override
 	public FileSystem getFileSystem(URI uri) {
-		// TODO Auto-generated method stub
-		return null;
+		synchronized(fileSystems) {
+			Path fsPath = toFileSystemPath(uri);
+			if(!fileSystems.containsKey(fsPath))
+				throw new FileSystemNotFoundException();
+			return fileSystems.get(fsPath);
+		}
 	}
 
+	private String getFileSystemSpecificPart(URI uri) {
+		String spec = uri.getSchemeSpecificPart();
+		String ext = ".ipf";
+		int index = spec.indexOf(ext);
+		if(index == -1)
+			throw new IllegalArgumentException();
+		return spec.substring(index + ext.length());
+	}
+	
 	@Override
 	public Path getPath(URI uri) {
-		// TODO Auto-generated method stub
-		return null;
+		FileSystem fs = null;
+		try {
+			fs = getFileSystem(uri);
+		} catch(FileSystemNotFoundException e) {
+			try {
+				fs = newFileSystem(uri, new HashMap<String, String>());
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		return fs.getPath(getFileSystemSpecificPart(uri));
 	}
 
 	@Override

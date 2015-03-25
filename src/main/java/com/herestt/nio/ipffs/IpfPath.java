@@ -14,6 +14,20 @@ import java.util.Iterator;
 
 public class IpfPath implements Path {
 
+	private final IpfFileSystem ipffs;
+	private final String path;
+	
+	protected IpfPath(IpfFileSystem ipffs, String path) {
+		this.ipffs = ipffs;
+		ensurePath(path);
+		this.path = path;
+	}
+	
+	private void ensurePath(String path) {
+		if(!(path.matches("^(/?[a-zA-Z0-9_\\-]+)+(\\.[a-zA-Z]+)*$|/")))
+			throw new IllegalArgumentException();
+	}
+	
 	public FileSystem getFileSystem() {
 		// TODO Auto-generated method stub
 		return null;
