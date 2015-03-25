@@ -13,7 +13,7 @@ import java.nio.file.WatchService;
 import java.util.Iterator;
 
 public class IpfPath implements Path {
-
+	
 	private final IpfFileSystem ipffs;
 	private final String path;
 	
@@ -29,48 +29,97 @@ public class IpfPath implements Path {
 	}
 	
 	public FileSystem getFileSystem() {
-		// TODO Auto-generated method stub
-		return null;
+		return ipffs;
 	}
 
 	public boolean isAbsolute() {
-		// TODO Auto-generated method stub
+		if(path.startsWith("/"))
+			return true;
 		return false;
 	}
 
 	public Path getRoot() {
-		// TODO Auto-generated method stub
+		if(isAbsolute())
+			return new IpfPath(ipffs, "/");
 		return null;
 	}
 
 	public Path getFileName() {
-		// TODO Auto-generated method stub
-		return null;
+		if(path.length() == 0)
+			return null;
+		if(path.length() == 1 && path != "/")
+			return this;
+		String[] elements = path.split("/");
+		return new IpfPath(ipffs, elements[elements.length - 1]);
 	}
 
 	public Path getParent() {
-		// TODO Auto-generated method stub
+		if(path.length() == 0)
+			return null;
+		int nameCount = getNameCount();
+		if(nameCount == 1 && isAbsolute())
+			return getRoot();
+		if(nameCount > 0)
+			return subpath(0, nameCount- 1);
 		return null;
 	}
 
 	public int getNameCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		if(path.equals(getRoot().toString()))
+			return 0;
+		if(isAbsolute())
+			return path.split("/").length - 1;
+		else
+			return path.split("/").length;
 	}
 
 	public Path getName(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		if(isAbsolute())
+			index ++;
+		return new IpfPath(ipffs, path.split("/")[index]);
 	}
 
 	public Path subpath(int beginIndex, int endIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		if(beginIndex < 0 ||
+				beginIndex >= path.length() ||
+				endIndex > path.length() ||
+				beginIndex >= endIndex)
+				throw new IllegalArgumentException();
+			
+			String[] elements = path.split("/");
+			String first = "";
+			String[] more;
+			
+			if(isAbsolute() && beginIndex == 0)
+				first = "/";
+			
+			if(elements.length > 0) {
+				first += elements[1];
+				int length = endIndex - beginIndex - 1;
+				more = new String[length];
+				System.arraycopy(elements, beginIndex + 2, more, 0, length);
+			}
+			else
+				more = new String[0];
+			
+			return ipffs.getPath(first, more);
 	}
 
 	public boolean startsWith(Path other) {
-		// TODO Auto-generated method stub
-		return false;
+		if(!(other instanceof IpfPath))
+			return false;
+		if(getNameCount() < other.getNameCount())
+			return false;		
+		if(!isAbsolute() || !other.isAbsolute())
+			return false;
+		int nameCount = other.getNameCount();
+		for(int i = 0; i < nameCount; i++) {
+			String name = getName(i).toString();
+			String otherName = other.getName(i).toString();
+			if(!name.equals(otherName))
+				return false;
+		}
+		return true;
 	}
 
 	public boolean startsWith(String other) {
@@ -134,20 +183,17 @@ public class IpfPath implements Path {
 	}
 
 	public File toFile() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public WatchKey register(WatchService watcher, Kind<?>[] events,
 			Modifier... modifiers) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public WatchKey register(WatchService watcher, Kind<?>... events)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public Iterator<Path> iterator() {
@@ -160,4 +206,8 @@ public class IpfPath implements Path {
 		return 0;
 	}
 
+	@Override
+	public String toString() {
+		return path;
+	}
 }
