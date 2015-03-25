@@ -26,8 +26,7 @@ public class IpfFileSystem extends FileSystem {
 	
 	@Override
 	public FileSystemProvider provider() {
-		// TODO Auto-generated method stub
-		return null;
+		return provider;
 	}
 
 	@Override
