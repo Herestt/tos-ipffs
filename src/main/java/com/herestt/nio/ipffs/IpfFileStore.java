@@ -9,11 +9,14 @@ public class IpfFileStore extends FileStore {
 
 	private String name;
 	private long fileCount;
+	private long listOffset;
 	private byte[] magicNumber;
 	
-	protected IpfFileStore(String name, long fileCount,	byte[] magicNumber) {
+	protected IpfFileStore(String name, long fileCount,
+			long listOffset, byte[] magicNumber) {
 		this.name = name;
 		this.fileCount = fileCount;
+		this.listOffset = listOffset;
 		this.magicNumber = magicNumber;
 	}
 	
@@ -82,6 +85,10 @@ public class IpfFileStore extends FileStore {
 	
 	public long getFileCount() {
 		return fileCount;
+	}
+	
+	public long getListOffset() {
+		return listOffset;
 	}
 	
 	public byte[] getMagicNumber() {

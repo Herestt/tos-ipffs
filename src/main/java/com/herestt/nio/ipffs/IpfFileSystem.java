@@ -130,6 +130,7 @@ public class IpfFileSystem extends FileSystem {
 				IpfFileStore ipffstore = new IpfFileStore(
 						fileSystemPath.getName(fileSystemPath.getNameCount() - 1).toString(),
 						FileContent.read().asUnsignedShort(),
+						FileContent.read().asUnsignedInt(),
 						FileContent.skip(4).read().asBytes(4)
 						);
 				set.add(ipffstore);
