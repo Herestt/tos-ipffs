@@ -201,8 +201,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	@Override
 	public <A extends BasicFileAttributes> A readAttributes(Path path,
 			Class<A> type, LinkOption... options) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return IpfFileSystem.searchFileAttributes(toIpfPath(path), type);
 	}
 
 	@Override

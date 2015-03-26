@@ -1,5 +1,6 @@
 package com.herestt.nio.ipffs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashSet;
@@ -141,33 +143,50 @@ public class IpfFileSystem extends FileSystem {
 		return set;
 	}
 	
-	private Set<IpfFileAttributes> getFilesAttributes() {
-		Set<IpfFileAttributes> attrs = new HashSet<>();
+	@SuppressWarnings("unchecked")
+	protected static <A extends BasicFileAttributes> A searchFileAttributes(IpfPath path,
+			Class<A> type) throws FileNotFoundException {
+		if(type != IpfFileAttributes.class)
+			throw new UnsupportedOperationException("Only IpfFileAttributes class is allowed.");
+		
 		try {
-			long headerOffset = Files.size(fileSystemPath) - 24;
-			try(SeekableByteChannel sbc = FileContent.access(fileSystemPath, headerOffset)) {
+			Path fsPath = path.getFileSystem().getIpfFileSystemPath();
+			long headerOffset = Files.size(fsPath) - 24;
+			try(SeekableByteChannel sbc = FileContent.access(fsPath, headerOffset)) {
 				FileContent.order(ByteOrder.LITTLE_ENDIAN);
 				int fileCount = FileContent.read().asUnsignedShort();
 				long listOffset = FileContent.read().asUnsignedInt();
-				int nameSize, parentNameSize;
+				int pathSize, fsNameSize;
+				String strPath;
 				FileContent.position(listOffset);
 				for(int i = 0; i < fileCount; i++) {
-					IpfFileAttributes a = new IpfFileAttributes(
-							nameSize = FileContent.read().asUnsignedShort(),
-							FileContent.read().asUnsignedInt(),
-							FileContent.read().asUnsignedInt(),
-							FileContent.read().asUnsignedInt(),
-							FileContent.read().asUnsignedInt(),
-							parentNameSize = FileContent.read().asUnsignedShort(),
-							FileContent.read().asString(parentNameSize),
-							FileContent.read().asString(nameSize)
-							);
-					attrs.add(a);
+					
+					pathSize = FileContent.read().asUnsignedShort();
+					FileContent.skip(16);
+					fsNameSize = FileContent.read().asUnsignedShort();
+					FileContent.skip(fsNameSize);
+					strPath = FileContent.read().asString(pathSize);
+					
+					if(path.toString().equals("/" + strPath)) {
+						FileContent.skip(-(fsNameSize + pathSize + 20));	// Get back to the beginning of the file description.					
+						IpfFileAttributes ipffa = (IpfFileAttributes) type.newInstance();
+						
+						ipffa.setPathSize(pathSize = FileContent.read().asUnsignedShort());
+						ipffa.setCrc(FileContent.read().asUnsignedInt());
+						ipffa.setCompressedSize(FileContent.read().asUnsignedInt());
+						ipffa.size(FileContent.read().asUnsignedInt());
+						ipffa.setOffset(FileContent.read().asUnsignedInt());
+						ipffa.setFsNameSize(fsNameSize = FileContent.read().asUnsignedShort());
+						ipffa.setFsName(FileContent.read().asString(fsNameSize));
+						ipffa.setPath(strPath);
+						
+						return (A) ipffa;
+					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (IOException | InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		return attrs;
+		throw new FileNotFoundException();
 	}
 }
