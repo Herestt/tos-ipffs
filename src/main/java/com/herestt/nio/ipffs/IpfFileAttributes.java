@@ -5,6 +5,31 @@ import java.nio.file.attribute.FileTime;
 
 public class IpfFileAttributes implements BasicFileAttributes {
 
+	private int nameSize;
+	private long crc;
+	private long compressedSize;
+	private long size;
+	private long offset;
+	private int parentNameSize;
+	private String parentName;
+	private String name;
+	
+	
+	
+	public IpfFileAttributes(int nameSize, long crc, long compressedSize,
+			long size, long offset, int parentNameSize, String parentName,
+			String name) {
+		super();
+		this.nameSize = nameSize;
+		this.crc = crc;
+		this.compressedSize = compressedSize;
+		this.size = size;
+		this.offset = offset;
+		this.parentNameSize = parentNameSize;
+		this.parentName = parentName;
+		this.name = name;
+	}
+
 	public FileTime lastModifiedTime() {
 		// TODO Auto-generated method stub
 		return null;

@@ -28,7 +28,7 @@ public class IpfPath implements Path {
 			throw new IllegalArgumentException();
 	}
 	
-	public FileSystem getFileSystem() {
+	public IpfFileSystem getFileSystem() {
 		return ipffs;
 	}
 

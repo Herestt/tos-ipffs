@@ -21,6 +21,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +50,14 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 		path.normalize();
 		
 		return path;
+	}
+	
+	private IpfPath toIpfPath(Path path) {
+		if(path == null)
+			throw new NullPointerException();
+		if(!(path instanceof IpfPath))
+			throw new IllegalArgumentException();
+		return (IpfPath) path;
 	}
 	
 	@Override
@@ -162,8 +171,18 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 
 	@Override
 	public FileStore getFileStore(Path path) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		Path fsPath = toIpfPath(path).getFileSystem().getIpfFileSystemPath();
+		if(fsPath.getFileSystem() != FileSystems.getDefault())
+			throw new UnsupportedOperationException("The path must be relative to the default file system.");
+		synchronized (fileSystems) {
+			if(!fileSystems.containsKey(fsPath))
+				throw new FileSystemNotFoundException();
+			Iterator<FileStore> it = fileSystems.get(fsPath).getFileStores().iterator();
+			FileStore fstore = it.next();	// A path is only related to one file store.
+			if(fstore == null)
+				throw new IllegalArgumentException("This path doesn't have a file store.");
+			return fstore;
+		}
 	}
 
 	@Override
