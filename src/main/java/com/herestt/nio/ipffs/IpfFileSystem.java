@@ -12,7 +12,6 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -126,19 +125,16 @@ public class IpfFileSystem extends FileSystem {
 		Set<FileStore> set = new HashSet<>();
 		try {
 			long headerOffset = Files.size(fileSystemPath) - 24;
-			Set<IpfFileAttributes> files = getFilesAttributes();
 			try(SeekableByteChannel sbc = FileContent.access(fileSystemPath, headerOffset)) {
 				FileContent.order(ByteOrder.LITTLE_ENDIAN);
 				IpfFileStore ipffstore = new IpfFileStore(
 						fileSystemPath.getName(fileSystemPath.getNameCount() - 1).toString(),
 						FileContent.read().asUnsignedShort(),
-						FileContent.skip(4).read().asBytes(4),
-						files
+						FileContent.skip(4).read().asBytes(4)
 						);
 				set.add(ipffstore);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return set;
