@@ -11,12 +11,14 @@ public class IpfFileAttributes implements BasicFileAttributes {
 	private long size;
 	private long offset;
 	private int parentNameSize;
-	private String parentName;
-	private String name;
+	private String fsName;
+	private String path;
+	
+	public IpfFileAttributes() {}
 	
 	public IpfFileAttributes(int nameSize, long crc, long compressedSize,
-			long size, long offset, int parentNameSize, String parentName,
-			String name) {
+			long size, long offset, int parentNameSize, String fsName,
+			String path) {
 		super();
 		this.nameSize = nameSize;
 		this.crc = crc;
@@ -24,8 +26,8 @@ public class IpfFileAttributes implements BasicFileAttributes {
 		this.size = size;
 		this.offset = offset;
 		this.parentNameSize = parentNameSize;
-		this.parentName = parentName;
-		this.name = name;
+		this.fsName = fsName;
+		this.path = path;
 	}
 
 	public FileTime lastModifiedTime() {
@@ -78,27 +80,63 @@ public class IpfFileAttributes implements BasicFileAttributes {
 		return nameSize;
 	}
 
+	public void setNameSize(int nameSize) {
+		this.nameSize = nameSize;
+	}
+
 	public long getCrc() {
 		return crc;
+	}
+
+	public void setCrc(long crc) {
+		this.crc = crc;
 	}
 
 	public long getCompressedSize() {
 		return compressedSize;
 	}
 
+	public void setCompressedSize(long compressedSize) {
+		this.compressedSize = compressedSize;
+	}
+
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
+	}
+
 	public long getOffset() {
 		return offset;
+	}
+
+	public void setOffset(long offset) {
+		this.offset = offset;
 	}
 
 	public int getParentNameSize() {
 		return parentNameSize;
 	}
 
-	public String getParentName() {
-		return parentName;
+	public void setParentNameSize(int parentNameSize) {
+		this.parentNameSize = parentNameSize;
 	}
 
-	public String getName() {
-		return name;
+	public String getFsName() {
+		return fsName;
+	}
+
+	public void setFsName(String fsName) {
+		this.fsName = fsName;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
 	}
 }
