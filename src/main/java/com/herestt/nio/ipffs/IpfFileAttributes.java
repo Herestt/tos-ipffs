@@ -14,8 +14,6 @@ public class IpfFileAttributes implements BasicFileAttributes {
 	private String parentName;
 	private String name;
 	
-	
-	
 	public IpfFileAttributes(int nameSize, long crc, long compressedSize,
 			long size, long offset, int parentNameSize, String parentName,
 			String name) {
@@ -66,8 +64,7 @@ public class IpfFileAttributes implements BasicFileAttributes {
 	}
 
 	public long size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return size;
 	}
 
 	public Object fileKey() {
@@ -75,4 +72,33 @@ public class IpfFileAttributes implements BasicFileAttributes {
 		return null;
 	}
 
+	/*** IPF File Attributes Specific Methods ***/
+	
+	public int getNameSize() {
+		return nameSize;
+	}
+
+	public long getCrc() {
+		return crc;
+	}
+
+	public long getCompressedSize() {
+		return compressedSize;
+	}
+
+	public long getOffset() {
+		return offset;
+	}
+
+	public int getParentNameSize() {
+		return parentNameSize;
+	}
+
+	public String getParentName() {
+		return parentName;
+	}
+
+	public String getName() {
+		return name;
+	}
 }
