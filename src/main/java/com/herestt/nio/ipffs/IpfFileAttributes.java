@@ -5,27 +5,26 @@ import java.nio.file.attribute.FileTime;
 
 public class IpfFileAttributes implements BasicFileAttributes {
 
-	private int nameSize;
+	private int pathSize;
 	private long crc;
 	private long compressedSize;
 	private long size;
 	private long offset;
-	private int parentNameSize;
+	private int fsNameSize;
 	private String fsName;
 	private String path;
 	
 	public IpfFileAttributes() {}
-	
-	public IpfFileAttributes(int nameSize, long crc, long compressedSize,
-			long size, long offset, int parentNameSize, String fsName,
-			String path) {
+
+	public IpfFileAttributes(int pathSize, long crc, long compressedSize,
+			long size, long offset, int fsNameSize, String fsName, String path) {
 		super();
-		this.nameSize = nameSize;
+		this.pathSize = pathSize;
 		this.crc = crc;
 		this.compressedSize = compressedSize;
 		this.size = size;
 		this.offset = offset;
-		this.parentNameSize = parentNameSize;
+		this.fsNameSize = fsNameSize;
 		this.fsName = fsName;
 		this.path = path;
 	}
@@ -76,12 +75,12 @@ public class IpfFileAttributes implements BasicFileAttributes {
 
 	/*** IPF File Attributes Specific Methods ***/
 	
-	public int getNameSize() {
-		return nameSize;
+	public int getPathSize() {
+		return pathSize;
 	}
 
-	public void setNameSize(int nameSize) {
-		this.nameSize = nameSize;
+	public void setPathSize(int pathSize) {
+		this.pathSize = pathSize;
 	}
 
 	public long getCrc() {
@@ -100,11 +99,7 @@ public class IpfFileAttributes implements BasicFileAttributes {
 		this.compressedSize = compressedSize;
 	}
 
-	public long getSize() {
-		return size;
-	}
-
-	public void setSize(long size) {
+	public void size(long size) {
 		this.size = size;
 	}
 
@@ -116,12 +111,12 @@ public class IpfFileAttributes implements BasicFileAttributes {
 		this.offset = offset;
 	}
 
-	public int getParentNameSize() {
-		return parentNameSize;
+	public int getFsNameSize() {
+		return fsNameSize;
 	}
 
-	public void setParentNameSize(int parentNameSize) {
-		this.parentNameSize = parentNameSize;
+	public void setFsNameSize(int fsNameSize) {
+		this.fsNameSize = fsNameSize;
 	}
 
 	public String getFsName() {
