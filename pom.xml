@@ -5,4 +5,11 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>IPF File System</name>
   <description>A java NIO File System Provider implementation for the IPF file type which is used for the  Tree of Savior game.</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.herestt.common</groupId>
+  		<artifactId>hucc</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
