@@ -40,7 +40,7 @@ public class IpfDirectoryStream implements DirectoryStream<Path> {
 	public Iterator<Path> iterator() {
 		try {
 			sbc = Files.newByteChannel(fsPath(dir), StandardOpenOption.READ);
-			return new IpfDirectoryIterator(dir.getFileSystem(), sbc, filter);
+			return new IpfDirectoryIterator(dir, sbc, filter);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

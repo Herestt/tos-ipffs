@@ -13,15 +13,15 @@ public class IpfDirectoryIterator implements Iterator<Path>{
 
 	private final static int HEADER_SIZE = 24;
 	
-	private IpfFileSystem ipffs;
+	private IpfPath dir;
 	private Filter<? super Path> filter;
 	private int fileCount;
 	private int currentCount = 0;
 	private long listOffset;
 	private Path next;
 	
-	public IpfDirectoryIterator(IpfFileSystem ipffs, SeekableByteChannel sbc, Filter<? super Path> filter) {
-		this.ipffs = ipffs;
+	public IpfDirectoryIterator(IpfPath dir, SeekableByteChannel sbc, Filter<? super Path> filter) {
+		this.dir = dir;
 		this.filter = filter;
 		try {
 			long headerOffset = sbc.size() - HEADER_SIZE;
@@ -41,7 +41,7 @@ public class IpfDirectoryIterator implements Iterator<Path>{
 		int fsNameSize = FileContent.read().asUnsignedShort();
 		FileContent.skip(fsNameSize);
 		String strPath = FileContent.read().asString(pathSize);
-		return ipffs.getPath("/" + strPath);
+		return dir.getFileSystem().getPath("/" + strPath);
 	}
 	
 	@Override
@@ -51,7 +51,8 @@ public class IpfDirectoryIterator implements Iterator<Path>{
 		try {
 			Path p = readNextPath();
 			currentCount++;
-			if(filter.accept(p)) {
+			if(p.getParent().toString().equals(dir.toString())
+					&& filter.accept(p)) {
 				next = p;
 				return true;
 			}
