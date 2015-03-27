@@ -126,8 +126,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir,
 			Filter<? super Path> filter) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return new IpfDirectoryStream(toIpfPath(dir), filter);
 	}
 
 	@Override
@@ -171,7 +170,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 
 	@Override
 	public FileStore getFileStore(Path path) throws IOException {
-		Path fsPath = toIpfPath(path).getFileSystem().getIpfFileSystemPath();
+		Path fsPath = toIpfPath(path).getFileSystem().getFileSystemPath();
 		if(fsPath.getFileSystem() != FileSystems.getDefault())
 			throw new UnsupportedOperationException("The path must be relative to the default file system.");
 		synchronized (fileSystems) {
