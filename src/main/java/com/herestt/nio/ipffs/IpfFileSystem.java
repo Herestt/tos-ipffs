@@ -119,7 +119,7 @@ public class IpfFileSystem extends FileSystem {
 
 	/*** IPF File System Specific Methods ***/
 	
-	public Path getIpfFileSystemPath() {
+	public Path getFileSystemPath() {
 		return fileSystemPath;
 	}
 	
@@ -150,7 +150,7 @@ public class IpfFileSystem extends FileSystem {
 			throw new UnsupportedOperationException("Only IpfFileAttributes class is allowed.");
 		
 		try {
-			Path fsPath = path.getFileSystem().getIpfFileSystemPath();
+			Path fsPath = path.getFileSystem().getFileSystemPath();
 			long headerOffset = Files.size(fsPath) - 24;
 			try(SeekableByteChannel sbc = FileContent.access(fsPath, headerOffset)) {
 				FileContent.order(ByteOrder.LITTLE_ENDIAN);
