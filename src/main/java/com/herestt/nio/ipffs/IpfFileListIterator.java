@@ -3,7 +3,6 @@ package com.herestt.nio.ipffs;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream.Filter;
-import java.nio.file.Path;
 import java.util.Iterator;
 
 public abstract class IpfFileListIterator<E> implements Iterator<E> {
@@ -42,8 +41,7 @@ public abstract class IpfFileListIterator<E> implements Iterator<E> {
 
 	@Override
 	public E next() {
-		// TODO Auto-generated method stub
-		return null;
+		return next;
 	}
 	
 	/**
