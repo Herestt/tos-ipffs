@@ -1,5 +1,6 @@
 package com.herestt.nio.ipffs;
 
+import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Path;
@@ -11,11 +12,11 @@ public abstract class IpfFileListIterator<E> implements Iterator<E> {
 	
 	private IpfPath dir;
 	private SeekableByteChannel sbc;
-	private Filter<? super Path> filter;
+	private Filter<E> filter;
 	private boolean initialized = false;
 	private E next;
 	
-	protected IpfFileListIterator(IpfPath dir, SeekableByteChannel sbc, Filter<? super Path> filter) {
+	protected IpfFileListIterator(IpfPath dir, SeekableByteChannel sbc, Filter<E> filter) {
 		this.dir = dir;
 		this.sbc = sbc;
 		this.filter = filter;
@@ -23,7 +24,19 @@ public abstract class IpfFileListIterator<E> implements Iterator<E> {
 	
 	@Override
 	public boolean hasNext() {
-		// TODO Auto-generated method stub
+		if(!initialized)
+			init(dir, sbc);
+		E entry = process();
+		if(entry == null)
+			return false;
+		try {
+			if(filter.accept(entry)) {
+				next = entry;
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
