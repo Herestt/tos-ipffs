@@ -60,7 +60,7 @@ public abstract class IpfFileListIterator<E> implements Iterator<E> {
 	 * The processing implementation. The method is called for each hasNext occurrence
 	 * and is in charge of creating the object that will be returned by hasNext.
 	 * 
-	 * @return The generated object.
+	 * @return The generated object, or null if there is isn't any element to process..
 	 */
 	public abstract E process();
 
