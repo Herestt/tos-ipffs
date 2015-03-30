@@ -7,8 +7,6 @@ import java.util.Iterator;
 
 public abstract class IpfFileListIterator<E> implements Iterator<E> {
 	
-	private final static int HEADER_SIZE = 24;
-	
 	private IpfPath dir;
 	private SeekableByteChannel sbc;
 	private Filter<E> filter;
