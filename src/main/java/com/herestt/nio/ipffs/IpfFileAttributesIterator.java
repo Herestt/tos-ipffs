@@ -39,8 +39,25 @@ public class IpfFileAttributesIterator extends IpfFileListIterator<IpfFileAttrib
 
 	@Override
 	public IpfFileAttributes process() {
-		// TODO Auto-generated method stub
-		return null;
+		if(currentCount >= fileCount)
+			return null;
+		int pathSize, fsNameSize;
+		IpfFileAttributes ipffa = null;
+		try {
+			ipffa = new IpfFileAttributes(
+					pathSize = FileContent.read().asUnsignedShort(),
+					FileContent.read().asUnsignedInt(),
+					FileContent.read().asUnsignedInt(),
+					FileContent.read().asUnsignedInt(),
+					FileContent.read().asUnsignedInt(),
+					fsNameSize = FileContent.read().asUnsignedShort(),
+					FileContent.read().asString(fsNameSize),
+					FileContent.read().asString(pathSize)
+					);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		currentCount++;
+		return ipffa;
 	}
-
 }
