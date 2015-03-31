@@ -14,6 +14,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -148,43 +149,14 @@ public class IpfFileSystem extends FileSystem {
 			Class<A> type) throws FileNotFoundException {
 		if(type != IpfFileAttributes.class)
 			throw new UnsupportedOperationException("Only IpfFileAttributes class is allowed.");
-		
-		try {
-			Path fsPath = path.getFileSystem().getFileSystemPath();
-			long headerOffset = Files.size(fsPath) - 24;
-			try(SeekableByteChannel sbc = FileContent.access(fsPath, headerOffset)) {
-				FileContent.order(ByteOrder.LITTLE_ENDIAN);
-				int fileCount = FileContent.read().asUnsignedShort();
-				long listOffset = FileContent.read().asUnsignedInt();
-				int pathSize, fsNameSize;
-				String strPath;
-				FileContent.position(listOffset);
-				for(int i = 0; i < fileCount; i++) {
-					
-					pathSize = FileContent.read().asUnsignedShort();
-					FileContent.skip(16);
-					fsNameSize = FileContent.read().asUnsignedShort();
-					FileContent.skip(fsNameSize);
-					strPath = FileContent.read().asString(pathSize);
-					
-					if(path.toString().equals("/" + strPath)) {
-						FileContent.skip(-(fsNameSize + pathSize + 20));	// Get back to the beginning of the file description.					
-						IpfFileAttributes ipffa = (IpfFileAttributes) type.newInstance();
-						
-						ipffa.setPathSize(pathSize = FileContent.read().asUnsignedShort());
-						ipffa.setCrc(FileContent.read().asUnsignedInt());
-						ipffa.setCompressedSize(FileContent.read().asUnsignedInt());
-						ipffa.size(FileContent.read().asUnsignedInt());
-						ipffa.setOffset(FileContent.read().asUnsignedInt());
-						ipffa.setFsNameSize(fsNameSize = FileContent.read().asUnsignedShort());
-						ipffa.setFsName(FileContent.read().asString(fsNameSize));
-						ipffa.setPath(strPath);
-						
-						return (A) ipffa;
-					}
-				}
+		try(IpfDirectoryStream<IpfFileAttributes> stream = new IpfDirectoryStream<IpfFileAttributes>(path, IpfFileAttributesIterator.class, null)) {
+			Iterator<IpfFileAttributes> it = stream.iterator();
+			while(it.hasNext()) {
+				IpfFileAttributes attrs = it.next();
+				if(path.toString().equals("/" + attrs.getPath()))
+					return (A) attrs;
 			}
-		} catch (IOException | InstantiationException | IllegalAccessException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		throw new FileNotFoundException();
