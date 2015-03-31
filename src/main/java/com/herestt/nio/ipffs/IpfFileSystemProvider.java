@@ -126,7 +126,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	@Override
 	public DirectoryStream<Path> newDirectoryStream(Path dir,
 			Filter<? super Path> filter) throws IOException {
-		return new IpfDirectoryStream(toIpfPath(dir), filter);
+		return new IpfDirectoryStream<>(toIpfPath(dir), IpfDirectoryIterator.class, filter);
 	}
 
 	@Override

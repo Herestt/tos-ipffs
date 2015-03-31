@@ -2,68 +2,50 @@ package com.herestt.nio.ipffs;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 import com.herestt.common.io.FileContent;
 
-public class IpfDirectoryIterator implements Iterator<Path>{
-
+public class IpfDirectoryIterator extends IpfIterator<Path> {
+	
 	private final static int HEADER_SIZE = 24;
 	
-	private IpfPath dir;
-	private Filter<? super Path> filter;
 	private int fileCount;
 	private int currentCount = 0;
 	private long listOffset;
-	private Path next;
 	
-	public IpfDirectoryIterator(IpfPath dir, SeekableByteChannel sbc, Filter<? super Path> filter) {
-		this.dir = dir;
-		this.filter = filter;
+	@Override
+	public void init() {
+		Path ipf = path.getFileSystem().getFileSystemPath();
 		try {
-			long headerOffset = sbc.size() - HEADER_SIZE;
+			long headerOffset = Files.size(ipf) - HEADER_SIZE;
 			FileContent.access(sbc, headerOffset);
 			FileContent.order(ByteOrder.LITTLE_ENDIAN);
-			this.fileCount = FileContent.read().asUnsignedShort();
-			this.listOffset = FileContent.read().asUnsignedInt();
+			fileCount = FileContent.read().asUnsignedShort();
+			listOffset = FileContent.read().asUnsignedInt();
 			FileContent.position(listOffset);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private Path readNextPath() throws IOException {
-		int pathSize = FileContent.read().asUnsignedShort();
-		FileContent.skip(16);
-		int fsNameSize = FileContent.read().asUnsignedShort();
-		FileContent.skip(fsNameSize);
-		String strPath = FileContent.read().asString(pathSize);
-		return dir.getFileSystem().getPath("/" + strPath);
-	}
-	
+
 	@Override
-	public boolean hasNext() {
+	public Path process() {
 		if(currentCount >= fileCount)
-			return false;
+			return null;
+		Path p = null;
 		try {
-			Path p = readNextPath();
-			currentCount++;
-			if(p.getParent().toString().equals(dir.toString())
-					&& filter.accept(p)) {
-				next = p;
-				return true;
-			}
+			int pathSize = FileContent.read().asUnsignedShort();
+			FileContent.skip(16);
+			int fsNameSize = FileContent.read().asUnsignedShort();
+			FileContent.skip(fsNameSize);
+			String strPath = FileContent.read().asString(pathSize);
+			p = path.getFileSystem().getPath("/" + strPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
-	}
-
-	@Override
-	public Path next() {
-		return next;
+		currentCount++;
+		return p;
 	}
 }

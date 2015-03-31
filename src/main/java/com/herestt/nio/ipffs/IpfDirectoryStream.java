@@ -6,17 +6,18 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 
-public class IpfDirectoryStream implements DirectoryStream<Path> {
+public class IpfDirectoryStream<E> implements DirectoryStream<E> {
 	
 	private IpfPath dir;
-	Filter<? super Path> filter;
-	private SeekableByteChannel sbc = null;
+	private Class<? extends IpfIterator<E>> iterator;
+	private Filter<? super E> filter;
+	private SeekableByteChannel sbc;
 	
-	public IpfDirectoryStream(IpfPath dir, Filter<? super Path> filter) {
+	protected IpfDirectoryStream(IpfPath dir, Class<? extends IpfIterator<E>> iterator, Filter<? super E> filter) {
 		this.dir = dir;
+		this.iterator = iterator;
 		this.filter = filter;
 		ensureDirectory(dir);
 	}
@@ -37,14 +38,17 @@ public class IpfDirectoryStream implements DirectoryStream<Path> {
 			sbc.close();
 	}
 
-	public Iterator<Path> iterator() {
+	public Iterator<E> iterator() {
 		try {
-			sbc = Files.newByteChannel(fsPath(dir), StandardOpenOption.READ);
-			return new IpfDirectoryIterator(dir, sbc, filter);
-		} catch (IOException e) {
+			sbc = Files.newByteChannel(fsPath(dir));
+			IpfIterator<E> it = iterator.newInstance();
+			it.setDirectory(dir);
+			it.setChannel(sbc);
+			it.setFilter(filter);
+			return it;
+		} catch (InstantiationException | IllegalAccessException | IOException e) {
 			e.printStackTrace();
 		}
-		throw new IllegalArgumentException("Cannot create an iterator for the '" +
-				fsPath(dir).toString() + "' file.");
+		throw new IllegalArgumentException("Unable to create an iterator for this path.");
 	}
 }
