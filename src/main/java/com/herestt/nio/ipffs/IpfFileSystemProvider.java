@@ -1,5 +1,6 @@
 package com.herestt.nio.ipffs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -119,8 +120,15 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	public SeekableByteChannel newByteChannel(Path path,
 			Set<? extends OpenOption> options, FileAttribute<?>... attrs)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		SeekableByteChannel sbc = null;
+		try {
+			IpfPath file = toIpfPath(path);
+			IpfFileAttributes a = IpfFileSystem.searchFileAttributes(file, IpfFileAttributes.class);
+			sbc = new IpfSeekableByteChannelImpl(file, options, a);
+		} catch(FileNotFoundException e) {
+			throw new UnsupportedOperationException("The file doesn't exist. Plus this file system doesn't allow file creation.");
+		}
+		return sbc;
 	}
 
 	@Override
