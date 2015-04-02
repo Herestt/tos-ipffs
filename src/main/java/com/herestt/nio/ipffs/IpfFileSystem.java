@@ -2,6 +2,7 @@ package com.herestt.nio.ipffs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
@@ -124,6 +125,10 @@ public class IpfFileSystem extends FileSystem {
 		return fileSystemPath;
 	}
 	
+	private static FileSystemProvider provider(IpfPath path) {
+		return path.getFileSystem().provider();
+	}
+	
 	private Set<FileStore> createFileStoresSet() {
 		Set<FileStore> set = new HashSet<>();
 		try {
@@ -162,7 +167,60 @@ public class IpfFileSystem extends FileSystem {
 		throw new FileNotFoundException();
 	}
 	
-	private static FileSystemProvider provider(IpfPath path) {
-		return path.getFileSystem().provider();
+	/**
+	 * Gets the file attributes of a stored file.
+	 * 
+	 * @param path The file path.
+	 * @param type The type of attributes.
+	 * @return The desired file attributes
+	 * @throws FileNotFoundException - if the file is not stored in the file system.
+	 */
+	protected static <A extends BasicFileAttributes> A getFileAttributes(IpfPath path,
+			Class<A> type) throws FileNotFoundException {
+		// TODO - Herestt.
+		return null;
+	}
+	
+	/**
+	 * Inflates a PKZip file content.
+	 * 
+	 * IPF stored files are compressed by using the PKZip algorithm.
+	 * 
+	 * @param input The compressed content.
+	 * @param output The inflated content.
+	 * 
+	 * @throws IllegalArgumentException - if a buffer is direct.
+	 */
+	private static void inflate(ByteBuffer input, ByteBuffer output) {
+		// TODO - Herestt.
+	}
+	
+	/**
+	 * Dumps a file against another file system's one.
+	 * 
+	 * @param file The file to dump.
+	 * @param target The target to copy the content to.
+	 * 
+	 * @throws IOException - if an I/O error occurs.
+	 */
+	protected static void dump(IpfPath file, Path target) throws IOException {
+		// TODO - Herestt.
+	}
+	
+	/**
+	 * Accesses the content of a file through a {@link SeekableByteChannel}.
+	 * 
+	 * The file is dumped against a temporary file that is deleted when the 
+	 * {@link SeekableByteChannel} is closed. So mind using a try-with-resource
+	 * statement when using the function.
+	 * 
+	 * @param file The file to access.
+	 * @return A {@link SeekableByteChannel} connected the file.
+	 * 
+	 * @throws IOException - if an I/O error occurs.
+	 */
+	protected SeekableByteChannel access(IpfPath file) throws IOException {
+		// TODO - Herestt.
+		return null;
 	}
 }
