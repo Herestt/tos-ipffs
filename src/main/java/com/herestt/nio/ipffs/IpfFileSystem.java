@@ -11,10 +11,12 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashSet;
@@ -239,7 +241,8 @@ public class IpfFileSystem extends FileSystem {
 	 * 
 	 * @throws IOException - if an I/O error occurs.
 	 */
-	protected SeekableByteChannel access(IpfPath file) throws IOException {
+	protected SeekableByteChannel access(IpfPath file, Set<? extends OpenOption> options,
+			FileAttribute<?>... attrs) throws IOException {
 		// TODO - Herestt.
 		return null;
 	}
