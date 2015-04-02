@@ -123,7 +123,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 		SeekableByteChannel sbc = null;
 		try {
 			IpfPath file = toIpfPath(path);
-			IpfFileAttributes a = IpfFileSystem.searchFileAttributes(file, IpfFileAttributes.class);
+			IpfFileAttributes a = IpfFileSystem.getFileAttributes(file, IpfFileAttributes.class);
 			sbc = new IpfSeekableByteChannelImpl(file, options, a);
 		} catch(FileNotFoundException e) {
 			throw new UnsupportedOperationException("The file doesn't exist. Plus this file system doesn't allow file creation.");
@@ -208,7 +208,7 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	@Override
 	public <A extends BasicFileAttributes> A readAttributes(Path path,
 			Class<A> type, LinkOption... options) throws IOException {
-		return IpfFileSystem.searchFileAttributes(toIpfPath(path), type);
+		return IpfFileSystem.getFileAttributes(toIpfPath(path), type);
 	}
 
 	@Override

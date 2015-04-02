@@ -149,36 +149,29 @@ public class IpfFileSystem extends FileSystem {
 		return set;
 	}
 	
+	/**
+	 * Gets the file attributes of a stored file.
+	 * 
+	 * @param path The file path.
+	 * @param type The type of attributes.
+	 * @return The desired file attributes.
+	 * 
+	 * @throws IOException - if an I/O error occurs.
+	 */
 	@SuppressWarnings("unchecked")
-	protected static <A extends BasicFileAttributes> A searchFileAttributes(IpfPath path,
-			Class<A> type) throws FileNotFoundException {
+	protected static <A extends BasicFileAttributes> A getFileAttributes(IpfPath path,
+			Class<A> type) throws IOException {
 		if(type != IpfFileAttributes.class)
 			throw new UnsupportedOperationException("Only IpfFileAttributes class is allowed.");
-		try(IpfDirectoryStream<IpfFileAttributes> stream = new IpfDirectoryStream<IpfFileAttributes>(path, IpfFileAttributesIterator.class, null)) {
+		try(IpfDirectoryStream<IpfFileAttributes> stream = new IpfDirectoryStream<>(path, IpfFileAttributesIterator.class, null)) {
 			Iterator<IpfFileAttributes> it = stream.iterator();
 			while(it.hasNext()) {
 				IpfFileAttributes attrs = it.next();
 				if(path.toString().equals("/" + attrs.getPath()))
 					return (A) attrs;
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} 
 		throw new FileNotFoundException();
-	}
-	
-	/**
-	 * Gets the file attributes of a stored file.
-	 * 
-	 * @param path The file path.
-	 * @param type The type of attributes.
-	 * @return The desired file attributes
-	 * @throws FileNotFoundException - if the file is not stored in the file system.
-	 */
-	protected static <A extends BasicFileAttributes> A getFileAttributes(IpfPath path,
-			Class<A> type) throws FileNotFoundException {
-		// TODO - Herestt.
-		return null;
 	}
 	
 	/**
