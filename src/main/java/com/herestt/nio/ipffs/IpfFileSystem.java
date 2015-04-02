@@ -18,6 +18,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import com.herestt.common.io.FileContent;
 
@@ -183,9 +185,15 @@ public class IpfFileSystem extends FileSystem {
 	 * @param output The inflated content.
 	 * 
 	 * @throws IllegalArgumentException - if a buffer is direct.
+	 * @throws DataFormatException - if input data is not PKZip.
 	 */
-	private static void inflate(ByteBuffer input, ByteBuffer output) {
-		// TODO - Herestt.
+	private static void inflate(ByteBuffer input, ByteBuffer output) throws DataFormatException {
+		if(input.isDirect() || output.isDirect())
+			throw new IllegalArgumentException();
+		Inflater decompresser = new Inflater(true);
+		decompresser.setInput(input.array());
+		decompresser.inflate(output.array());
+		decompresser.end();
 	}
 	
 	/**
