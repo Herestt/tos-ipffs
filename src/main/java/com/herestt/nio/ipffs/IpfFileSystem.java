@@ -2,11 +2,14 @@ package com.herestt.nio.ipffs;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
@@ -163,7 +166,7 @@ public class IpfFileSystem extends FileSystem {
 	@SuppressWarnings("unchecked")
 	protected static <A extends BasicFileAttributes> A getFileAttributes(IpfPath path,
 			Class<A> type) throws IOException {
-		if(type != IpfFileAttributes.class)
+		if(!(type == BasicFileAttributes.class || type == IpfFileAttributes.class))
 			throw new UnsupportedOperationException("Only IpfFileAttributes class is allowed.");
 		try(IpfDirectoryStream<IpfFileAttributes> stream = new IpfDirectoryStream<>(path, IpfFileAttributesIterator.class, null)) {
 			Iterator<IpfFileAttributes> it = stream.iterator();
@@ -199,13 +202,29 @@ public class IpfFileSystem extends FileSystem {
 	/**
 	 * Dumps a file against another file system's one.
 	 * 
-	 * @param file The file to dump.
-	 * @param target The target to copy the content to.
+	 * @param src The file to dump.
+	 * @param dest The target to copy the content to.
 	 * 
 	 * @throws IOException - if an I/O error occurs.
+	 * @throws DataFormatException 
 	 */
-	protected static void dump(IpfPath file, Path target) throws IOException {
-		// TODO - Herestt.
+	protected static void dump(IpfPath src, Path dest) throws IOException, DataFormatException {
+		if(src == null || dest == null
+				|| dest.getFileSystem() != FileSystems.getDefault())
+			throw new IllegalArgumentException("The file ");
+		IpfFileAttributes attrs = getFileAttributes(src, IpfFileAttributes.class);
+		try(SeekableByteChannel srcSbc = FileContent.access(src, attrs.getOffset());
+				RandomAccessFile raf = new RandomAccessFile(dest.toFile(), "rw");
+				FileChannel destChannel = raf.getChannel()) {
+			
+			FileContent.order(ByteOrder.LITTLE_ENDIAN);
+			ByteBuffer srcBuffer = FileContent.read().asByteBuffer((int) attrs.getCompressedSize());
+			ByteBuffer destBuffer = ByteBuffer.allocate((int) attrs.size());
+						
+			inflate(srcBuffer, destBuffer);
+			
+			destChannel.write(destBuffer);
+		}
 	}
 	
 	/**

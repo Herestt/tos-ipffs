@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.DataFormatException;
 
 public class IpfFileSystemProvider extends FileSystemProvider {
 
@@ -153,8 +154,11 @@ public class IpfFileSystemProvider extends FileSystemProvider {
 	@Override
 	public void copy(Path source, Path target, CopyOption... options)
 			throws IOException {
-		// TODO Auto-generated method stub
-		
+		try {
+			IpfFileSystem.dump(toIpfPath(source), target);
+		} catch (DataFormatException e) {
+			throw new IOException();
+		}
 	}
 
 	@Override
