@@ -20,6 +20,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,6 +36,8 @@ public class IpfFileSystem extends FileSystem {
 	private final Path fileSystemPath;
 	private final Map<String, ?> env;
 	private final Set<FileStore> fileStores;
+	private boolean open = false;
+	private Set<SeekableByteChannel> channels;
 	
 	protected IpfFileSystem(IpfFileSystemProvider provider,
 			Path fileSystemPath, Map<String, ?> env) {
@@ -42,6 +45,7 @@ public class IpfFileSystem extends FileSystem {
 		this.fileSystemPath = fileSystemPath;
 		this.env = env;
 		fileStores = createFileStoresSet();
+		channels = Collections.synchronizedSet(new HashSet<>());
 	}
 
 	@Override
@@ -51,14 +55,19 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public void close() throws IOException {
-		// TODO Auto-generated method stub
-		
+		if(!isOpen())
+			return;
+		if(channels.size() > 0) {
+			for(SeekableByteChannel sbc : channels)
+				if(sbc.isOpen())
+					sbc.close();
+			channels.clear();
+		}
 	}
 
 	@Override
 	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
+		return open;
 	}
 
 	@Override
@@ -252,7 +261,9 @@ public class IpfFileSystem extends FileSystem {
 			Path tmp = Files.createTempFile("ipf", suffix, attrs);
 			try {
 				dump(file, tmp);
-				return new IpfSeekableByteChannelImpl(tmp, options);
+				SeekableByteChannel sbc = new IpfSeekableByteChannelImpl(tmp, options);
+				file.getFileSystem().channels.add(sbc);
+				return sbc;
 			} catch (DataFormatException e) {
 				Files.delete(file);
 				throw new IOException(); 
