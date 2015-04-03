@@ -133,10 +133,6 @@ public class IpfFileSystem extends FileSystem {
 		return fileSystemPath;
 	}
 	
-	private static FileSystemProvider provider(IpfPath path) {
-		return path.getFileSystem().provider();
-	}
-	
 	private Set<FileStore> createFileStoresSet() {
 		Set<FileStore> set = new HashSet<>();
 		try {
