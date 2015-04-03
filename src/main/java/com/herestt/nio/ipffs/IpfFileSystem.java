@@ -63,8 +63,7 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public boolean isReadOnly() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
@@ -74,8 +73,7 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public Iterable<Path> getRootDirectories() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -85,8 +83,7 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public Set<String> supportedFileAttributeViews() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -111,20 +108,17 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public PathMatcher getPathMatcher(String syntaxAndPattern) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public UserPrincipalLookupService getUserPrincipalLookupService() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public WatchService newWatchService() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/*** IPF File System Specific Methods ***/
@@ -133,6 +127,15 @@ public class IpfFileSystem extends FileSystem {
 		return fileSystemPath;
 	}
 	
+	/**
+	 * Creates a set containing the file store instance.
+	 * 
+	 * Due to the provider specification, the file system must return 
+	 * a set of file stores. However the IPF file system allows only
+	 * one file store object representing the '.ipf' file.
+	 *  
+	 * @return the file store wrapped into a set.
+	 */
 	private Set<FileStore> createFileStoresSet() {
 		Set<FileStore> set = new HashSet<>();
 		try {
