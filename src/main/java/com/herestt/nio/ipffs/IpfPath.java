@@ -3,7 +3,6 @@ package com.herestt.nio.ipffs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystem;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent.Kind;
@@ -12,6 +11,19 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Iterator;
 
+/**
+ * Describes an IPF file system <code>Path</code>.
+ * 
+ * <p>According to this file system all the <code>Path</code>s are absolute. Therefore, a
+ * <code>Path</code> has to respect this pattern: <code>/a/b/c</code> for a directory, or
+ * <code>/a/b/c/d.extension</code> for a file.</p>
+ * 
+ * <p>Although the file system doesn't store the '/' character to represent the root,
+ * this file system <code>Path</code> must specify it.</p>
+ * 
+ * @author Herestt
+ *
+ */
 public class IpfPath implements Path {
 	
 	private final IpfFileSystem ipffs;
