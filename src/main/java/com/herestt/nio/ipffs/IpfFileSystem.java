@@ -35,7 +35,7 @@ public class IpfFileSystem extends FileSystem {
 	private final IpfFileSystemProvider provider;
 	private final Path fileSystemPath;
 	private final Map<String, ?> env;
-	private final Set<FileStore> fileStores;
+	private Set<FileStore> fileStores;
 	private boolean open = false;
 	private Set<SeekableByteChannel> channels;
 	
@@ -44,7 +44,6 @@ public class IpfFileSystem extends FileSystem {
 		this.provider = provider;
 		this.fileSystemPath = fileSystemPath;
 		this.env = env;
-		fileStores = createFileStoresSet();
 		channels = Collections.synchronizedSet(new HashSet<>());
 	}
 
@@ -87,6 +86,8 @@ public class IpfFileSystem extends FileSystem {
 
 	@Override
 	public Iterable<FileStore> getFileStores() {
+		if(fileStores == null)
+			fileStores = createFileStoresSet();
 		return fileStores;
 	}
 
@@ -144,6 +145,7 @@ public class IpfFileSystem extends FileSystem {
 	 * one file store object representing the '.ipf' file.
 	 *  
 	 * @return the file store wrapped into a set.
+	 * @throws IOException 
 	 */
 	private Set<FileStore> createFileStoresSet() {
 		Set<FileStore> set = new HashSet<>();
@@ -160,7 +162,7 @@ public class IpfFileSystem extends FileSystem {
 				set.add(ipffstore);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace();	
 		}
 		return set;
 	}
