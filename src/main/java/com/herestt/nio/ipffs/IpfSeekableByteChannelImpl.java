@@ -14,6 +14,19 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Set;
 
+/**
+ * A {@link SeekableByteChannel} implementation for the IPF file system.
+ * 
+ * <p>This {@link SeekableByteChannel} handles reading and writing operations on IPF stored files. 
+ * Therefore only {@link IpfPath} are allowed.
+ * The configuration is made through {@link StandardOpenOption}. Only {@link StandardOpenOption#READ},
+ * {@link StandardOpenOption#WRITE} and {@link StandardOpenOption#APPEND} are allowed.</p>
+ * 
+ * <p><b>Notice:</b> By default this channel is opened with the {@link StandardOpenOption#READ} option.</p>
+ * 
+ * @author Herestt
+ *
+ */
 public class IpfSeekableByteChannelImpl implements SeekableByteChannel {
 	
 	private File file;
