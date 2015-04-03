@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
@@ -211,16 +212,20 @@ public class IpfFileSystem extends FileSystem {
 	 * @throws DataFormatException 
 	 */
 	protected static void dump(IpfPath src, Path dest) throws IOException, DataFormatException {
-		if(src == null || dest == null
+		Path fs = src.getFileSystem().getFileSystemPath();
+		if(src == null || fs == null || dest == null
+				|| fs.getFileSystem() != FileSystems.getDefault()
 				|| dest.getFileSystem() != FileSystems.getDefault())
 			throw new IllegalArgumentException("The file ");
 		IpfFileAttributes attrs = getFileAttributes(src, IpfFileAttributes.class);
-		try(SeekableByteChannel srcSbc = FileContent.access(src, attrs.getOffset());
+		try(RandomAccessFile srcRaf = new RandomAccessFile(fs.toFile(), "r");
+				SeekableByteChannel srcSbc = srcRaf.getChannel();
 				RandomAccessFile raf = new RandomAccessFile(dest.toFile(), "rw");
 				FileChannel destChannel = raf.getChannel()) {
 			
+			FileContent.access(srcSbc, attrs.getOffset());
 			FileContent.order(ByteOrder.LITTLE_ENDIAN);
-			ByteBuffer srcBuffer = FileContent.read().asByteBuffer((int) attrs.getCompressedSize());
+			ByteBuffer srcBuffer = ByteBuffer.wrap(FileContent.read().asBytes((int) attrs.getCompressedSize()));
 			ByteBuffer destBuffer = ByteBuffer.allocate((int) attrs.size());
 						
 			inflate(srcBuffer, destBuffer);
@@ -241,9 +246,20 @@ public class IpfFileSystem extends FileSystem {
 	 * 
 	 * @throws IOException - if an I/O error occurs.
 	 */
-	protected SeekableByteChannel access(IpfPath file, Set<? extends OpenOption> options,
+	protected static SeekableByteChannel access(IpfPath file, Set<? extends OpenOption> options,
 			FileAttribute<?>... attrs) throws IOException {
-		// TODO - Herestt.
-		return null;
+		if(options.contains(StandardOpenOption.DELETE_ON_CLOSE)) {
+			String suffix = file.toString().replaceAll("/", "_");
+			Path tmp = Files.createTempFile("ipf", suffix, attrs);
+			try {
+				dump(file, tmp);
+				return new IpfSeekableByteChannelImpl(tmp, options);
+			} catch (DataFormatException e) {
+				Files.delete(file);
+				throw new IOException(); 
+			}
+		}
+		Files.delete(file);
+		throw new IllegalArgumentException();
 	}
 }
