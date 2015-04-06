@@ -8,13 +8,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
+/**
+ * A {@link DirectoryStream} implementation for the IPF file system.
+ * 
+ * This stream connects a channel to an IPF file system and allows an iterator to be 
+ * built over its content description part.
+ * 
+ * @author Herestt
+ *
+ * @param <E> The data type to iterate through.
+ */
 public class IpfDirectoryStream<E> implements DirectoryStream<E> {
 	
+	/**	The directory of which the stream is associate with. */
 	private IpfPath dir;
+	
+	/** The iterator type.*/
 	private Class<? extends IpfIterator<E>> iterator;
+	
+	/** The filter to apply to the iterator. */
 	private Filter<? super E> filter;
+	
+	/** The channel that accesses the file system. */
 	private SeekableByteChannel sbc;
 	
+	/**
+	 * IPF Directory Stream constructor.
+	 * 
+	 * @param dir The directory of which the stream is associate with.
+	 * @param iterator The iterator type.
+	 * @param filter The filter to apply to the iterator.
+	 */
 	protected IpfDirectoryStream(IpfPath dir, Class<? extends IpfIterator<E>> iterator, Filter<? super E> filter) {
 		this.dir = dir;
 		this.iterator = iterator;
@@ -22,6 +46,11 @@ public class IpfDirectoryStream<E> implements DirectoryStream<E> {
 		ensureDirectory(dir);
 	}
 	
+	/**
+	 * Checks whether a path is relative to this file system.
+	 * 
+	 * @param dir The directory to test.
+	 */
 	private void ensureDirectory(IpfPath dir) {
 		if(dir == null)
 			throw new NullPointerException();
@@ -29,6 +58,14 @@ public class IpfDirectoryStream<E> implements DirectoryStream<E> {
 			throw new IllegalArgumentException();
 	}
 	
+	/**
+	 * Easy access to the {@link Path} of the file system that holds the target 
+	 * directory. 
+	 * 
+	 * @param dir The inner directory.
+	 * 
+	 * @return the file system path.
+	 */
 	private Path fsPath(IpfPath dir) {
 		return dir.getFileSystem().getFileSystemPath();
 	}
