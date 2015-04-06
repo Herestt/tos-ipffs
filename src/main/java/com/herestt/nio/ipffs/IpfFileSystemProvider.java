@@ -26,6 +26,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.DataFormatException;
 
+/**
+ * A IPF file system provider implementation.
+ * 
+ * <p>This provider allows {@link URI}s respecting the <code>ipf</code> schemes. Actually, due to the
+ * fact that <code>.ipf</code> files are stored in the default file system, the {@link URI} has first
+ * to represent the default scheme by starting by <code>file:///</code>, and a IPF file system by 
+ * finishing by the <code>.ipf</code> extension.
+ * The <code>ipf:</code> scheme takes place to wrap the targeted file held by the IPF file system. 
+ * So, to reach a file, a {@link URI} has first to be relative to the file system, then to the targeted file :
+ * <pre>
+ * {@code
+ * URI uri = new URI("ipf:file:///C:/Program%20Files/TreeOfSavior/data/ies.ipf/ability.ies");
+ * Path path = Paths.get(uri);
+ * }
+ * </pre></p>
+ * 
+ * @see IpfFileSystem
+ * @see IpfPath
+ * 
+ * @author Herestt
+ *
+ */
 public class IpfFileSystemProvider extends FileSystemProvider {
 
 	private Map<Path, IpfFileSystem> fileSystems = new HashMap<>();
