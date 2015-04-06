@@ -30,6 +30,58 @@ import java.util.zip.Inflater;
 
 import com.herestt.common.io.FileContent;
 
+/**
+ * A IPF file system implementation.
+ * 
+ * <p>An IPF file system can only be instantiated trough the {@link IpfFileSystemProvider} and over
+ * an '.ipf' file stored in the default file system.</p>
+ *   
+ * <p>Information about the file system can be observed through the {@link IpfFileStore} object
+ * given by this class.</p>
+ * 
+ * <p>About stored files, this file system allows :
+ * 	<ul>
+ * 		<li>attributes reading;</li>
+ * 		<li>dumping of content against files created on the default file system;</li>
+ * 		<li>reading access through a {@link SeekableByteChannel}.</li>
+ * 	</ul>
+ * </p>
+ * 
+ * <p>File attributes are defined by the {@link IpfFileAttributes} class, but can also be accessed
+ * simply as following :
+ * <pre>
+ *  {@code
+ *  URI uri = new URI("ipf:file:///C:/Program%20Files/TreeOfSavior/data/ies.ipf/ability.ies");
+ *  Path path = Paths.get(uri); 
+ *  IpfFileAttributes ipffa = Files.readAttributes(path, IpfFileAttributes.class);}
+ * </pre></p>
+ * 
+ * <p>The dumping function can only be used through the {@link IpfFileSystemProvider#copy(Path, Path, java.nio.file.CopyOption...)}
+ * method :
+ * <pre>
+ * {@code
+ * URI uri = new URI("ipf:file:///C:/Program%20Files/TreeOfSavior/data/ies.ipf/ability.ies");
+ * Path source = Paths.get(uri);
+ * Path out = Paths.get("C:\\Users\\MyAccount\\Desktop\\ability.ies");
+ * Files.copy(source, out);
+ * }
+ * </pre></p>
+ * 
+ * <p>Finally, to read a file through a {@link SeekableByteChannel} :
+ * <pre>
+ * try(SeekableByteChannel sbc = Files.newByteChannel(path, 
+ * StandardOpenOption.READ, StandardOpenOption.DELETE_ON_CLOSE)) {
+ *	// code...
+ * }
+ * </pre></p>
+ * 
+ * <p><b>Note :</b> All the stored files are compressed by using the <code>PKZip</code> algorithm. 
+ * Therefore this file system is in charge of the extraction when a file is dumped or when a channel
+ * is connected to a file.</p>
+ * 
+ * @author Herestt
+ *
+ */
 public class IpfFileSystem extends FileSystem {
 
 	private final IpfFileSystemProvider provider;
