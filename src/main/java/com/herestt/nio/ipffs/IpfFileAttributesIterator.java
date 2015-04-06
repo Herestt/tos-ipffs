@@ -7,6 +7,12 @@ import java.nio.file.Path;
 
 import com.herestt.common.io.FileContent;
 
+/**
+ * An iterator that parses {@link IpfFileAttributes} from IPF file systems.
+ * 
+ * @author Herestt
+ *
+ */
 public class IpfFileAttributesIterator extends IpfIterator<IpfFileAttributes> {
 
 	private final static int HEADER_SIZE = 24;
