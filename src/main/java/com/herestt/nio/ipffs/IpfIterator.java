@@ -6,11 +6,28 @@ import java.nio.file.DirectoryStream.Filter;
 import java.util.Iterator;
 
 /**
- * An IPF file system iterator.  
+ * An abstract IPF file system iterator.  
+ * 
+ * <p>When using an implementation of this iterator, at first call of the {@link #hasNext()} 
+ * method, the {@link #init()} method is called. This method is in charge of setting up the 
+ * processing phase. To do so, this abstract class supplies :
+ * <ul>
+ * 	<li>the {@link IpfPath} ({@link #path}) of the targeted directory;</li>
+ * 	<li>a {@link SeekableByteChannel} ({@link #sbc}) to access its file system.</li>
+ * </ul></p>
+ * 
+ * <p>Once the initialization is done, the {@link #process()} method will be called at each iteration so as
+ * to parse and return the current element. If there is no more element, this function must return <code>null</code>.</p>
+ * 
+ * <p>In conclusion, an iterator has to implements both the {@link #init()} and the {@link #process()} 
+ * methods.</p>
  * 
  * @author Herestt
  *
  * @param <E> The data type of the elements that represents file attributes.
+ * 
+ * @see IpfDirectoryIterator
+ * @see IpfFileAttributesIterator
  */
 public abstract class IpfIterator<E> implements Iterator<E> {
 	
