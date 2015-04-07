@@ -1,4 +1,4 @@
-package com.herestt.nio.ipffs;
+package com.herestt.tos.nio.ipffs;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -8,13 +8,13 @@ import java.nio.file.Path;
 import com.herestt.common.io.FileContent;
 
 /**
- * An iterator that parses {@link IpfFileAttributes} from IPF file systems.
+ * An iterator that parses {@link IpfPath} fromIPF file systems.
  * 
  * @author Herestt
  *
  */
-public class IpfFileAttributesIterator extends IpfIterator<IpfFileAttributes> {
-
+public class IpfDirectoryIterator extends IpfIterator<Path> {
+	
 	private final static int HEADER_SIZE = 24;
 	
 	private int fileCount;
@@ -37,26 +37,21 @@ public class IpfFileAttributesIterator extends IpfIterator<IpfFileAttributes> {
 	}
 
 	@Override
-	public IpfFileAttributes process() {
+	public Path process() {
 		if(currentCount >= fileCount)
 			return null;
-		int pathSize, fsNameSize;
-		IpfFileAttributes ipffa = null;
+		Path p = null;
 		try {
-			ipffa = new IpfFileAttributes(
-					pathSize = FileContent.read().asUnsignedShort(),
-					FileContent.read().asUnsignedInt(),
-					FileContent.read().asUnsignedInt(),
-					FileContent.read().asUnsignedInt(),
-					FileContent.read().asUnsignedInt(),
-					fsNameSize = FileContent.read().asUnsignedShort(),
-					FileContent.read().asString(fsNameSize),
-					FileContent.read().asString(pathSize)
-					);
+			int pathSize = FileContent.read().asUnsignedShort();
+			FileContent.skip(16);
+			int fsNameSize = FileContent.read().asUnsignedShort();
+			FileContent.skip(fsNameSize);
+			String strPath = FileContent.read().asString(pathSize);
+			p = path.getFileSystem().getPath("/" + strPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		currentCount++;
-		return ipffa;
+		return p;
 	}
 }

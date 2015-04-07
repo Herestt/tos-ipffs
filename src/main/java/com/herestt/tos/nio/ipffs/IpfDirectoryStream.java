@@ -1,4 +1,4 @@
-package com.herestt.nio.ipffs;
+package com.herestt.tos.nio.ipffs;
 
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
