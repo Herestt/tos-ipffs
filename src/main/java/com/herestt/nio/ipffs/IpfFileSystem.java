@@ -86,6 +86,7 @@ public class IpfFileSystem extends FileSystem {
 
 	private final IpfFileSystemProvider provider;
 	private final Path fileSystemPath;
+	@SuppressWarnings("unused")
 	private final Map<String, ?> env;
 	private Set<FileStore> fileStores;
 	private boolean open = false;
