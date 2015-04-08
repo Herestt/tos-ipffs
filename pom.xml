@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.herestt.tos.nio.ipffs</groupId>
   <artifactId>ipffs</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>IPF File System</name>
   <description>A java NIO File System Provider implementation for the IPF file type which is used for the  Tree of Savior game.</description>
   <dependencies>
@@ -12,4 +11,9 @@
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
   </dependencies>
+  <parent>
+  	<groupId>com.herestt.tos</groupId>
+  	<artifactId>tos-lib</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  </parent>
 </project>
