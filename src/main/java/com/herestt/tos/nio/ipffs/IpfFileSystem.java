@@ -311,20 +311,16 @@ public class IpfFileSystem extends FileSystem {
 	 */
 	protected static SeekableByteChannel access(IpfPath file, Set<? extends OpenOption> options,
 			FileAttribute<?>... attrs) throws IOException {
-		if(options.contains(StandardOpenOption.DELETE_ON_CLOSE)) {
-			String suffix = file.toString().replaceAll("/", "_");
-			Path tmp = Files.createTempFile("ipf", suffix, attrs);
-			try {
-				dump(file, tmp);
-				SeekableByteChannel sbc = new IpfSeekableByteChannelImpl(tmp, options);
-				file.getFileSystem().channels.add(sbc);
-				return sbc;
-			} catch (DataFormatException e) {
-				Files.delete(file);
-				throw new IOException(); 
-			}
+		String suffix = file.toString().replaceAll("/", "_");
+		Path tmp = Files.createTempFile("ipf", suffix, attrs);
+		try {
+			dump(file, tmp);
+			SeekableByteChannel sbc = new IpfSeekableByteChannelImpl(tmp, options);
+			file.getFileSystem().channels.add(sbc);
+			return sbc;
+		} catch (DataFormatException e) {
+			Files.delete(file);
+			throw new IOException(); 
 		}
-		Files.delete(file);
-		throw new IllegalArgumentException();
 	}
 }
